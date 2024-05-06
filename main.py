@@ -1,11 +1,9 @@
-# ok how will i do this
-# Asetall is a auto installer for popular tool aseprite (https://www.github.com/aseprite/aseprite)
-# I am NOT affiliated with aseprite and this is not an official tool
+import subprocess
 
-# this script expects you to save files like skia to their default paths, if the script cant find it it will prompt you to A: install for you or B: let you specify a new path
+print("Welcome to Asetall!")
+print("For this program to run properly you have to choose what Operating System you're using")
+operatingsystem = input("Enter Your operating system here:\n Ubuntu/Debian/Fedora/Arch/SUSE:").lower()
 
+if operatingsystem == "windows":
+    subprocess.Popen(['python', './operatingsystems/Windows.py'])
 
-# start by using git clone --recursive https://github.com/aseprite/aseprite.git if it cant find /aseprite
-# if it updates ase start by discarding all changes (ADD WARNING!) and git pull and update submodule
-
-#
