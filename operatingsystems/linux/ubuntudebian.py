@@ -55,7 +55,6 @@ def Install():
 
     os.remove("Install.sh")
     skia_path = "skia.zip"
-    home_dir = os.path.expanduser(aseprite_path)
     skia_dir = os.path.join(home_dir, "deps/skia")
     # Construct the skia directory path relative to the home directory
     try:

@@ -5,7 +5,7 @@ import subprocess
 import sys
 import zipfile
 from configparser import ConfigParser
-
+import elevate
 import requests
 from requests_html import HTML
 
@@ -17,31 +17,32 @@ config = ConfigParser()
 
 try:
     # Uncomment on release!!
-    # elevate.elevate()
+    elevate.elevate()
     config.read("config.ini")
     vs_url = str(config["Windows"]["vs_link"])
     update = config["Windows"]["update"]
-    skia_link = config["Windows"]["skia_link"]
+    skia_link = config["Windows"]["skia_link_windows"]
     ninja_url = config["Windows"]["ninja_link"]
-    n_p = config["Windows"]["ninja_path"]
-    p_path = config["Windows"]["p_path"]
-    aseprite_path = config["Windows"]["aseprite_path"]
+    n_p = config["Windows"]["ninja_path_windows"]
+    p_path = config["Windows"]["p_path_windows"]
+    aseprite_path = config["Windows"]["aseprite_path_windows"]
     aseprite_link = config["Windows"]["aseprite_link"]
 
 except Exception as e:
-    print("Config File Is Corrupted or does not Exist!" + e)
+    print("Config File Is Corrupted or does not Exist!", e)
 
-if update == "True":
+home_dir = os.path.expanduser(aseprite_path)
+
+if update == "True": #TODO: fix this abomination of code (really broken imo)
     if os.path.isdir("Git"):
         shutil.rmtree("Git")
-
     git_r = requests.get("https://github.com/git-for-windows/git/releases/")
     git_r = HTML(html=str(git_r.content))
     git_url = git_r.links
     versions = []
     links = []
     for i in git_url:
-        if "MinGit" in i and "64" in i not in "busybox" in i:
+        if "MinGit" in i and "64" in i and not "busybox" in i:
             versions.append(i.split("MinGit-")[1].split("-")[0].replace(".", ""))
             links.append(i)
 
@@ -51,43 +52,45 @@ if update == "True":
     cmake_r = HTML(html=str(cmake_r.content))
     cmake_url = cmake_r.links
     for i in cmake_url:
-        if "windows" in i and "msi" in i and "64" in i:
+        if "windows" in i and "msi" in i and "x86_64" in i:
             cmake_url = i
             break
-
     git_url = "https://github.com" + git_url
-
     r_vs = requests.get(vs_url)
     r_git = requests.get(git_url)
     r_cmake = requests.get(cmake_url)
     r_skia = requests.get(skia_link)
     r_ninja = requests.get(ninja_url)
-
     os.mkdir("Git")
-
     open("Git.zip", "wb").write(r_git.content)
     open("vs.exe", "wb").write(r_vs.content)
     open("cmake.msi", "wb").write(r_cmake.content)
     open("skia.zip", "wb").write(r_skia.content)
     open("ninja.zip", "wb").write(r_ninja.content)
-
     with zipfile.ZipFile("Git.zip", "r") as zf:
         zf.extractall("Git")
-
     os.remove("Git.zip")
-
     os.system("cmake.msi")
-
     os.remove("cmake.msi")
-
     os.system("vs.exe")
-
     os.remove("vs.exe")
-
-    config.set("Windows", "update", "False")
-
+    config.set("Settings", "update", "False")
     with open("config.ini", "w") as configfile:
         config.write(configfile)
+
+# if update == "True":  TODO: decide which one to use
+#     print("it seems this is your first time running Asetall, please install these tools: \n The latest version of CMake (ADD TO PATH FOR ALL USERS), \n The ninja build system \n Visual studio 2022 (Aseprite doesn't support MinGW)\n The Desktop development with C++ item + Windows 10.0.18362.0 SDK from the Visual Studio installer \n for a visual guide go to this youtube video:")    
+#     print(
+#         "please wait, installing skia to "
+#         + aseprite_path
+#         + "deps/skia (update == True)"
+#     )
+#     r_skia = requests.get(skia_link)
+#     open("skia.zip", "wb").write(r_skia.content)
+
+#     config.set("Windows", "update", "False")
+#     with open("config.ini", "w") as configfile:
+#         config.write(configfile)
 
 
 def change_install_mode(mode):
@@ -98,7 +101,7 @@ def change_install_mode(mode):
 def Install():
     with open("Install.bat", "w") as f:
         f.write("SET PATH=%PATH%;" + os.getcwd() + "/Git/cmd" + "\n")
-        f.write("cd " + aseprite_path + "\n")
+        f.write("cd " + home_dir + "\n")
         f.write("git clone --recursive " + aseprite_link)
 
     subprocess.call(["Install.bat"])
@@ -106,14 +109,21 @@ def Install():
     os.remove("Install.bat")
 
     skia_path = "skia.zip"
-    ninja_path = "ninja.zip"
+    # ninja_path = "ninja.zip"
 
+    skia_dir = os.path.join(home_dir, "deps/skia")
+    # Construct the skia directory path relative to the home directory
     try:
-        with zipfile.ZipFile(skia_path, "r") as zf:
-            zf.extractall(aseprite_path + "deps/skia")
+        # Open the ZIP file
+        with zipfile.ZipFile(skia_path, "r") as zip_ref:
+            # Extract all files to skia_dir
+            zip_ref.extractall(path=skia_dir)
+            print("Extracted skia.zip to", skia_dir)
+    except (zipfile.BadZipFile, OSError) as e:
+        print("Error extracting skia.zip:", e)
 
-        with zipfile.ZipFile(ninja_path, "r") as zf:
-            zf.extractall(n_p)
+        # with zipfile.ZipFile(ninja_path, "r") as zf:
+        #     zf.extractall(n_p)
 
     except Exception as e:
         print("exception occured: " + e)
@@ -137,12 +147,12 @@ def Install():
 
     else:
         print(
-            "No Visual Studio installation found. Please refer to https://github.com/TheLiteCrafter/AsepriteTool"
+            "No Visual Studio installation found. Please refer to https://github.com/TheLiteCrafter/AsepriteTool" #TODO: Rewrite this
         )
 
     os.system(
         'shortcut /a:c /f:"C:/ProgramData/Microsoft/Windows/Start Menu/Programs/Aseprite.lnk" /t:"'
-        + aseprite_path
+        + home_dir
         + 'aseprite/build/bin/aseprite.exe"'
     )
 
@@ -265,17 +275,8 @@ while 1:
             Update()
 
     elif command == "req":
-        r = requests.get(
-            "https://github.com/aseprite/aseprite/blob/main/INSTALL.md#windows-dependencies"
-        )
-        sdk = str(r.content).split("Desktop development with C++ item + ", 1)[1]
-        sdk = sdk[: sdk.find("</a>")]
 
         print("Requirements: ")
         print("")
-        print(
-            "Visual Studio and Cmake will automatically be downloaded. On Cmake don't forget to select add to Path for all Users, and on Visual Studio the Desktop Development with C++ and under Individual Items "
-            + sdk
-        )
-
+        print("")
         first = False
