@@ -16,12 +16,12 @@ InstallMode = "Auto"
 config = ConfigParser()
 
 try:
-    # TODO Uncomment on release
+    # Uncomment on release!!
     # elevate.elevate()
     config.read("config.ini")
     vs_url = str(config["Settings"]["vs_link"])
     update = config["Settings"]["update"]
-    skia_url = config["Settings"]["skia_link"]
+    skia_link = config["Settings"]["skia_link"]
     ninja_url = config["Settings"]["ninja_link"]
     n_p = config["Settings"]["ninja_path"]
     p_path = config["Settings"]["p_path"]
@@ -60,7 +60,7 @@ if update == "True":
     r_vs = requests.get(vs_url)
     r_git = requests.get(git_url)
     r_cmake = requests.get(cmake_url)
-    r_skia = requests.get(skia_url)
+    r_skia = requests.get(skia_link)
     r_ninja = requests.get(ninja_url)
 
     os.mkdir("Git")
@@ -86,7 +86,7 @@ if update == "True":
 
     config.set("Settings", "update", "False")
 
-    with open("../config.ini", "w") as configfile:
+    with open("config.ini", "w") as configfile:
         config.write(configfile)
 
 
@@ -116,10 +116,10 @@ def Install():
             zf.extractall(n_p)
 
     except Exception as e:
-        print(e)
+        print("exception occured: " + e)
 
     if os.path.isdir(p_path + "Microsoft Visual Studio/2022/Community/Common7/Tools"):
-        _extracted_from_Install_21(
+        BuildAseprite(
             'call "'
             + p_path
             + 'Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" -arch=x64'
@@ -128,7 +128,7 @@ def Install():
     elif os.path.isdir(
         p_path[:-1] + " (x86)" + "/Microsoft Visual Studio/2019/Community/Common7/Tools"
     ):
-        _extracted_from_Install_21(
+        BuildAseprite(
             'call "'
             + p_path[:-1]
             + " (x86)"
@@ -152,8 +152,7 @@ def Install():
     os.remove("cmd.bat")
 
 
-# TODO Rename this here and in `Install`
-def _extracted_from_Install_21(arg0):
+def BuildAseprite(arg0):
     with open("cmd.bat", "w") as f:
         f.write(arg0 + "\n")
         f.write("cd " + aseprite_path + "aseprite" + "\n")
@@ -185,7 +184,7 @@ def Update():
         f.write("git submodule update --init --recursive")
 
     if os.path.isdir(p_path + "Microsoft Visual Studio/2022/Community/Common7/Tools"):
-        _extracted_from_Install_21(
+        BuildAseprite(
             'call "'
             + p_path
             + 'Microsoft Visual Studio/2022/Community/Common7/Tools/VsDevCmd.bat" -arch=x64'
@@ -194,7 +193,7 @@ def Update():
     elif os.path.isdir(
         p_path[:-1] + " (x86)" + "/Microsoft Visual Studio/2019/Community/Common7/Tools"
     ):
-        _extracted_from_Install_21(
+        BuildAseprite(
             'call "'
             + p_path[:-1]
             + " (x86)"

@@ -8,12 +8,14 @@ from configparser import ConfigParser
 import requests
 
 first = True
+command = "help"
 command = "req"
 InstallMode = "Auto"
 config = ConfigParser()
 
 try:
-    config.read("config.ini")
+    config.read("./operatingsystems/linux/config.ini")
+    update = config["Settings"]["update"]
     skia_link = config["Settings"]["skia_link"]
     aseprite_path = config["Settings"]["aseprite_path"]
     aseprite_link = config["Settings"]["aseprite_link"]
@@ -21,14 +23,14 @@ try:
 except Exception as e:
     print("Config File Is Corrupted or does not Exist!" + e)
 
+if update == "True":
+    print(
+        "please wait, installing skia to "
+        + aseprite_path
+        + "deps/skia (update == True)"
+    )
     r_skia = requests.get(skia_link)
-
-    os.mkdir("Git")
-
     open("skia.zip", "wb").write(r_skia.content)
-
-    with zipfile.ZipFile("Git.zip", "r") as zf:
-        zf.extractall("Git")
 
     config.set("Settings", "update", "False")
 
@@ -51,7 +53,7 @@ def Install():
     subprocess.call(["bash", "Install.sh"])
 
     os.remove("Install.sh")
-
+    # TODO: fix this
     skia_path = "skia.zip"
 
     try:
@@ -59,14 +61,16 @@ def Install():
             zf.extractall(aseprite_path + "deps/skia")
 
     except Exception as e:
-        print(e)
+        print("exception occured" + e)
     print(
-        "Prompting for sudo permissions in order to install packages and update packages \n (sudo apt-get all packages, sudo apt update and sudo apt upgrade"
+        "Prompting for sudo permissions in order to install packages and update packages \n (sudo apt-get all packages, sudo apt update)"
     )
     BuildAseprite()
 
     print(
-        "Done! Finished Compiling Aseprite! It can be found by searching for aseprite in the start menu"
+        "Done! Finished Compiling Aseprite! It can be found by going to"
+        + aseprite_path
+        + "aseprite/build/bin/aseprite"
     )
     os.remove("cmd.sh")
 
@@ -79,8 +83,6 @@ def BuildAseprite():
         )
         f.write("sudo apt update" + "\n")
         f.write("cd " + aseprite_path + "aseprite" + "\n")
-        f.write("git pull" + "\n")
-        f.write("git submodule update --init --recursive" + "\n")
         f.write("mkdir build" + "\n")
         f.write("cd " + aseprite_path + "aseprite/build" + "\n")
         f.write("export CC=clang" + "\n")
@@ -145,7 +147,9 @@ while 1:
         print("req - Shows all requirements")
         print("InstallMode Auto/Update/Install - Changes the Installation-Mode")
         print("InstallMode - Shows the current InstallMode")
-
+        print("dir - Shows where aseprite is installing to")
+    elif command == "dir":
+        print("Installing to: " + aseprite_path + "aseprite")
     elif command == "installmode":
         print("Current InstallMode is:" + InstallMode)
 
@@ -164,7 +168,7 @@ while 1:
     elif command == "start":
 
         if InstallMode == "Auto":
-            if os.path.isdir(aseprite_path + "aseprite"):
+            if os.path.isdir(aseprite_path + "deps"):
                 print("Update Mode detected. (currently bugged)")
                 Update()
             else:
