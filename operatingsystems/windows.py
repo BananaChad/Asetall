@@ -19,14 +19,14 @@ try:
     # Uncomment on release!!
     # elevate.elevate()
     config.read("config.ini")
-    vs_url = str(config["Settings"]["vs_link"])
-    update = config["Settings"]["update"]
-    skia_link = config["Settings"]["skia_link"]
-    ninja_url = config["Settings"]["ninja_link"]
-    n_p = config["Settings"]["ninja_path"]
-    p_path = config["Settings"]["p_path"]
-    aseprite_path = config["Settings"]["aseprite_path"]
-    aseprite_link = config["Settings"]["aseprite_link"]
+    vs_url = str(config["Windows"]["vs_link"])
+    update = config["Windows"]["update"]
+    skia_link = config["Windows"]["skia_link"]
+    ninja_url = config["Windows"]["ninja_link"]
+    n_p = config["Windows"]["ninja_path"]
+    p_path = config["Windows"]["p_path"]
+    aseprite_path = config["Windows"]["aseprite_path"]
+    aseprite_link = config["Windows"]["aseprite_link"]
 
 except Exception as e:
     print("Config File Is Corrupted or does not Exist!" + e)
@@ -84,7 +84,7 @@ if update == "True":
 
     os.remove("vs.exe")
 
-    config.set("Settings", "update", "False")
+    config.set("Windows", "update", "False")
 
     with open("config.ini", "w") as configfile:
         config.write(configfile)

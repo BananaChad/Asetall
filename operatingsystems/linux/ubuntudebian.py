@@ -1,4 +1,4 @@
-# works, original from AsepriteTool
+# works, original from AsepriteTool, Modified by @BananaChad
 import os
 import subprocess
 import sys
@@ -8,20 +8,21 @@ from configparser import ConfigParser
 import requests
 
 first = True
-command = "help"
 command = "req"
 InstallMode = "Auto"
 config = ConfigParser()
 
 try:
-    config.read("./operatingsystems/linux/config.ini")
+    config.read("config.ini")
     update = config["Settings"]["update"]
-    skia_link = config["Settings"]["skia_link"]
-    aseprite_path = config["Settings"]["aseprite_path"]
+    skia_link = config["Settings"]["skia_link_linux"]
+    aseprite_path = config["Settings"]["aseprite_path_linux"]
     aseprite_link = config["Settings"]["aseprite_link"]
 
 except Exception as e:
     print("Config File Is Corrupted or does not Exist!" + e)
+
+home_dir = os.path.expanduser(aseprite_path)
 
 if update == "True":
     print(
@@ -53,15 +54,18 @@ def Install():
     subprocess.call(["bash", "Install.sh"])
 
     os.remove("Install.sh")
-    # TODO: fix this
     skia_path = "skia.zip"
-
+    home_dir = os.path.expanduser(aseprite_path)
+    skia_dir = os.path.join(home_dir, "deps/skia")
+    # Construct the skia directory path relative to the home directory
     try:
-        with zipfile.ZipFile(skia_path, "r") as zf:
-            zf.extractall(aseprite_path + "deps/skia")
-
-    except Exception as e:
-        print("exception occured" + e)
+        # Open the ZIP file
+        with zipfile.ZipFile(skia_path, "r") as zip_ref:
+            # Extract all files to skia_dir
+            zip_ref.extractall(path=skia_dir)
+            print("Extracted skia.zip to", skia_dir)
+    except (zipfile.BadZipFile, OSError) as e:
+        print("Error extracting skia.zip:", e)
     print(
         "Prompting for sudo permissions in order to install packages and update packages \n (sudo apt-get all packages, sudo apt update)"
     )
@@ -168,7 +172,9 @@ while 1:
     elif command == "start":
 
         if InstallMode == "Auto":
-            if os.path.isdir(aseprite_path + "deps"):
+            if os.path.isdir(home_dir + "aseprite") and os.path.isdir(
+                    home_dir + "deps/skia"
+            ):
                 print("Update Mode detected. (currently bugged)")
                 Update()
             else:
@@ -178,11 +184,11 @@ while 1:
             Install()
         elif InstallMode == "Update":
             Update()
-
     elif command == "req":
         print("Requirements: ")
         print("")
         print(
             "The packages required will be auto installed when running install or update :)\n for more info go to https://github.com/aseprite/aseprite/blob/main/INSTALL.md#linux-dependencies"
         )
+        print("for a list of commands, type help")
         first = False
