@@ -9,12 +9,12 @@ operatingsystem = input(
 ).lower()
 
 if operatingsystem == "windows":
-    subprocess.Popen(["python", "./operatingsystems/Windows.py"])
+    subprocess.Popen(["python3", "./operatingsystems/windows.py"])
 elif operatingsystem == "ubuntu" or "debian":
-    subprocess.Popen(["python", "./operatingsystems/ubuntudebian.py"])
+    subprocess.Popen(["python3", "./operatingsystems/linux/ubuntudebian.py"])
 elif operatingsystem == "fedora":
-    subprocess.Popen(["python", "./operatingsystems/fedora.py"])
+    subprocess.Popen(["python3", "./operatingsystems/linux/fedora.py"])
 elif operatingsystem == "arch":
-    subprocess.Popen(["python", "./operatingsystems/arch.py"])
+    subprocess.Popen(["python3", "./operatingsystems/linux/arch.py"])
 elif operatingsystem == "suse":
-    subprocess.Popen(["python", "./operatingsystems/suse.py"])
+    subprocess.Popen(["python3", "./operatingsystems/linux/suse.py"])

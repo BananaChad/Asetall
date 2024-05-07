@@ -3,8 +3,8 @@
   <component name="Black">
     <option name="enabledOnReformat" value="true" />
     <option name="enabledOnSave" value="true" />
-    <option name="pathToExecutable" value="C:\Python312\Scripts\black.exe" />
-    <option name="sdkName" value="Python 3.12 (Asetall)" />
+    <option name="pathToExecutable" value="/usr/bin/black" />
+    <option name="sdkName" value="Python 3.10 (Asetall)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (Asetall)" project-jdk-type="Python SDK" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (Asetall)" project-jdk-type="Python SDK" />
 </project>

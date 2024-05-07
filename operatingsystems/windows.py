@@ -6,7 +6,6 @@ import sys
 import zipfile
 from configparser import ConfigParser
 
-import elevate
 import requests
 from requests_html import HTML
 
@@ -276,7 +275,7 @@ while 1:
         print("Requirements: ")
         print("")
         print(
-            "Visual Studio and Cmake will automatically be downloaded. On Cmake dont forget to select add to Path for all Users, and on Visual Studio the Desktop Development with C++ and under Individual Items "
+            "Visual Studio and Cmake will automatically be downloaded. On Cmake don't forget to select add to Path for all Users, and on Visual Studio the Desktop Development with C++ and under Individual Items "
             + sdk
         )
 
