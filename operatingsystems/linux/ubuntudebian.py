@@ -7,6 +7,7 @@ from configparser import ConfigParser
 
 import requests
 
+# autoopen = False
 first = True
 command = "req"
 InstallMode = "Auto"
@@ -14,13 +15,13 @@ config = ConfigParser()
 
 try:
     config.read("config.ini")
-    update = config["Settings"]["update"]
-    skia_link = config["Settings"]["skia_link_linux"]
-    aseprite_path = config["Settings"]["aseprite_path_linux"]
-    aseprite_link = config["Settings"]["aseprite_link"]
+    update = config["Ubuntu"]["update"]
+    skia_link = config["Ubuntu"]["skia_link_linux"]
+    aseprite_path = config["Ubuntu"]["aseprite_path_linux"]
+    aseprite_link = config["Ubuntu"]["aseprite_link"]
 
 except Exception as e:
-    print("Config File Is Corrupted or does not Exist!" + e)
+    print("Config File Is Corrupted or does not Exist!", e)
 
 home_dir = os.path.expanduser(aseprite_path)
 
@@ -33,7 +34,7 @@ if update == "True":
     r_skia = requests.get(skia_link)
     open("skia.zip", "wb").write(r_skia.content)
 
-    config.set("Settings", "update", "False")
+    config.set("Ubuntu", "update", "False")
 
     with open("./config.ini", "w") as configfile:
         config.write(configfile)
@@ -119,7 +120,8 @@ def BuildAseprite():
             + "\n"
         )
         f.write("ninja aseprite")
-
+        # if autoopen:
+        #     f.write(home_dir + "aseprite/build/bin/aseprite")
     subprocess.call(["bash", "cmd.sh"])
 
 
@@ -133,8 +135,15 @@ def Update():
     )
     BuildAseprite()
     print(
-        "Done! Finished Compiling Aseprite! It can be found by searching for aseprite in the start menu"
+        "Done! Finished Compiling Aseprite! It can be found by going to"
+        + aseprite_path
+        + "aseprite/build/bin/aseprite"
     )
+    # if not autoopen:
+    #     print("")
+    # elif autoopen:
+    #     print("Auto Opening Aseprite...")
+    #     # subprocess.call(home_dir + "aseprite/build/bin/aseprite")
     os.remove("cmd.sh")
 
 
@@ -151,6 +160,18 @@ while 1:
         print("InstallMode Auto/Update/Install - Changes the Installation-Mode")
         print("InstallMode - Shows the current InstallMode")
         print("dir - Shows where aseprite is installing to")
+        # print("AutoOpen True/False - Changes if aseprite auto opens after compiling")
+        # print("AutoOpen - Shows the state of AutoOpen (True/False)")
+    # elif command == "autoopen":
+    #     print("Auto Open is set to: ", autoopen)
+    #
+    # elif command == "autoopen true":
+    #     autoopen = True
+    #     print("autoopen set to ", autoopen)
+    #
+    # elif command == "autoopen false":
+    #     autoopen = False
+    #     print("autoopen set to ", autoopen)
     elif command == "dir":
         print("Installing to: " + aseprite_path + "aseprite")
     elif command == "installmode":
