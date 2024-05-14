@@ -2,6 +2,12 @@
 
 (WILL BE REWRITTEN SOON)
 
+# DISCLAIMER
+**The current code provided is buggy and is not reccomended to use (yet) this is a new project and im trying to re-implement certain methods of auto installing :D**
+
+
+old text from AsepriteTool
+
 Do you need Aseprite but don't have Money? I've got you! Maybe you've heard of Compiling Aseprite before and found it
 too hard. But with this tool, all you have to do is Type one single Command, and you're ready to go! Note that this
 works for updating too.
